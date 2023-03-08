@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment-clair.yml
+- deployment-postgresql.yml
+- namespace.yml
+- pg-pvc.yml
+- pg-rbac.yml
+- pg-sa.yml
+- pg-extension.yml
+- ingress.yml
+- extra-certs-job.yml
+- extra-certs-rbac.yml
+- extra-certs-sa.yml
+- deployment-postgres-exporter.yml
+
+images:
+- name: localhost/clair-rhel8
+  newName: registry.redhat.io/quay/clair-rhel8
+  newTag: v3.8.3-2
+- name: localhost/postgres-exporter
+  newName: docker.io/prometheuscommunity/postgres-exporter
+  newTag: latest
+- name: localhost/postgresql-10
+  newName: registry.redhat.io/rhel8/postgresql-10
+  newTag: 1-157
+- name: localhost/ocp-network-tools
+  newName: quay.io/openshift/origin-network-tools
+  newTag: latest

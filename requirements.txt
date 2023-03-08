@@ -1,0 +1,4 @@
+requests
+faker
+ldap3
+

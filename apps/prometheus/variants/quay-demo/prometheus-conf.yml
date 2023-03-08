@@ -1,0 +1,36 @@
+apiVersion: v1
+data:
+  prometheus.yml: |+
+    # my global config
+    global:
+      scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+      evaluation_interval: 120s # Evaluate rules every 15 seconds. The default is every 1 minute.
+      scrape_timeout: 10s # is set to the global default (10s).
+    scrape_configs:
+      - job_name: "prometheus"
+        static_configs:
+          - targets: ["localhost:9090"]
+      - job_name: "quay"
+        scheme: http
+        static_configs:
+        - targets: ["quay.quay.svc:9091", "quay-mirror.quay.svc:9091"]
+          labels:
+            instance: quay
+      - job_name: "clair"
+        scheme: http
+        static_configs:
+        - targets: ["clairv4.clair.svc:8089"]
+          labels:
+            instance: clair
+      - job_name: "postgres"
+        scheme: http
+        static_configs:
+        - targets: ["postgres-exporter.quay.svc:9187", "postgres-exporter.clair.svc:9187"]
+          labels:
+            instance: postgres
+
+
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: prometheus-conf

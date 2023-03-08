@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  extension.sh: |
+    psql -d quay -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: pg-extension
+  namespace: quay

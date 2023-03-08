@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  dnsmasq.conf: |
+    user=dnsmasq
+    group=dnsmasq
+    conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig
+    address=/quay.example.com/10.89.0.241
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: dnsmasq
+  namespace: quay

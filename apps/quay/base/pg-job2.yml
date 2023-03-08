@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-stale-conn-cleanup
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+        flux.weave.works/ignore: "true"
+        kustomize.toolkit.fluxcd.io/ignore: "true" 
+    spec:
+      containers:
+      - name: postgres-stale-conn-cleanup
+        imagePullPolicy: IfNotPresent
+        image: localhost/postgresql-10:1-157
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PGUSER
+          value: postgres
+        - name: PGPASSWORD
+          value: changeme
+        - name: PGDATABASE
+          value: quay
+        - name: PGHOST
+          value: postgres.$(NAMESPACE).svc
+        command:
+          - /bin/sh
+          - -c 
+          - "while /bin/true ; do psql -d quay -c \"SELECT pg_terminate_backend( (SELECT pid FROM pg_stat_activity WHERE state = 'idle in transaction (aborted)') ) FROM pg_stat_activity;\" >/dev/null 2>&1 ; sleep 1 ; done"
+      restartPolicy: Never
+  backoffLimit: 1

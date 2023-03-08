@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quay-mirror
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quay-mirror
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: quay-mirror
+        version: v1
+    spec:
+      containers:
+        - image: localhost/quay:v3.7.8-5
+          imagePullPolicy: IfNotPresent
+          name: quay-mirror
+          command:
+          - dumb-init
+          - --
+          - /quay-registry/quay-entrypoint.sh
+          - repomirror
+          env:
+            - name: DEBUGLOG
+              value: "true"
+            - name: WORKER_COUNT_REGISTRY
+              value: "5"
+            - name: WORKER_COUNT_SECSCAN
+              value: "5"
+            - name: DB_CONNECTION_POOLING
+              value: "true"
+          ports:
+            - containerPort: 8080
+              name: quay-http
+              protocol: TCP
+            - containerPort: 9091
+              name: 9091-http
+          volumeMounts:
+            - mountPath: /conf/stack
+              name: config
+            - mountPath: /conf/stack/extra_ca_certs
+              name: extra-ca-certs
+            - mountPath: /quay-registry/conf/nginx/server-base.conf.jnj
+              name: nginx-proxy
+              subPath: server-base.conf.jnj
+            - mountPath: /etc/docker/certs.d/quay.example.com/
+              name: extra-ca-certs
+            - mountPath: /etc/dnsmasq.conf
+              name: dnsmasq
+              subPath: dnsmasq.conf
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      restartPolicy: Always
+      volumes:
+        - name: config
+          secret:
+            secretName: quay-config-secret
+        - name: nginx-proxy
+          configMap:
+            items:
+            - key: server-base.conf.jnj
+              path: server-base.conf.jnj
+            name: nginx-proxy
+        - name: dnsmasq
+          configMap:
+            items:
+            - key: dnsmasq.conf
+              path: dnsmasq.conf
+            name: dnsmasq
+        - configMap:
+            defaultMode: 420
+            optional: true
+            name: extra-ca-certs
+          name: extra-ca-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quay-mirror
+  labels:
+    app: quay-mirror
+spec:
+  ports:
+    - name: http-8080
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: http-9091
+      port: 9091
+      protocol: TCP
+      targetPort: 9091
+  selector:
+    app: quay-mirror
+  type: ClusterIP

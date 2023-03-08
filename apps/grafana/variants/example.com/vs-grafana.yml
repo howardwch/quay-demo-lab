@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  creationTimestamp: "2022-12-26T12:33:55Z"
+  generation: 2
+  name: vs-grafana
+spec:
+  gateways:
+  - istio-system/frontend-gateway
+  hosts:
+  - grafana.example.com
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: grafana
+        subset: v1
+      weight: 100

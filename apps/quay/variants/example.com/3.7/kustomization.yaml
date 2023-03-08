@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../envs/prod/example.com/3.7
+- quay.yml
+- minio.yml
+- quay-mirror.yml

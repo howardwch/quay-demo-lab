@@ -1,0 +1,57 @@
+apiVersion: v1
+items:
+- apiVersion: networking.istio.io/v1beta1
+  kind: VirtualService
+  metadata:
+    name: quay
+  spec:
+    gateways:
+    - istio-system/frontend-gateway
+    hosts:
+    - quay.example.com
+    http:
+    - match:
+      - uri:
+          prefix: /metrics
+      route:
+      - destination:
+          host: quay.quay.svc.cluster.local
+          port:
+            number: 9091
+          subset: v1
+        weight: 100
+    - match:
+      - headers:
+          User-Agent:
+            prefix: Mozilla
+      route:
+      - destination:
+          host: quay.quay.svc.cluster.local
+          port:
+            number: 8080
+          subset: v1
+        weight: 100
+    - match:
+      - uri:
+          prefix: /
+      route:
+      - destination:
+          host: quay.quay.svc.cluster.local
+          port:
+            number: 8080
+          subset: v1
+        weight: 100
+- apiVersion: networking.istio.io/v1beta1
+  kind: DestinationRule
+  metadata:
+    name: quay
+  spec:
+    host: quay.quay.svc.cluster.local
+    subsets:
+    - labels:
+        version: v1
+      name: v1
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

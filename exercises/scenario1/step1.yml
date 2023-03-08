@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-mesh
+  namespace: quay
+spec:
+  hosts:
+  - minio.quay.svc
+  - minio.quay.svc.cluster.local
+  http:
+  - fault:
+      abort:
+        httpStatus: 520
+        percentage:
+          value: 33
+    match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: minio.quay.svc.cluster.local
+        port:
+          number: 9000
+        subset: v1
+      weight: 100

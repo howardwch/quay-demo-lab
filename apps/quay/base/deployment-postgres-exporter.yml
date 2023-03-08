@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    quay-component: postgres-exporter
+  name: postgres-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      quay-component: postgres-exporter
+  template:
+    metadata:
+      labels:
+        quay-component: postgres-exporter
+    spec:
+      containers:
+      - image: localhost/postgres-exporter:latest
+        imagePullPolicy: IfNotPresent
+        name: postgres-exporter
+        env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: DATA_SOURCE_NAME
+            value: "postgresql://admin:changeme@postgres.$(NAMESPACE).svc:5432/postgres?sslmode=disable"
+        ports:
+          - containerPort: 9187
+            name: prometheus
+            protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-exporter
+  labels:
+    quay-component: postgres-exporter
+spec:
+  ports:
+    - name: postgres-exporter
+      port: 9187
+      protocol: TCP
+      targetPort: 9187
+  selector:
+    quay-component: postgres-exporter
+  type: ClusterIP

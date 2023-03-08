@@ -1,0 +1,83 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: ./apps/metallb/base
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: kube-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: metallb-ips
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: metallb
+  interval: 2m0s
+  path: ./apps/metallb/variants/kind/default
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: kube-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: metallb-ips
+    - name: istio
+  interval: 5m0s
+  path: ./apps/traefik/base
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: kube-system
+--- 
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cert-manager
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: ./apps/cert-manager/base
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: cert-manager
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: istio
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cert-manager
+  interval: 5m0s
+  path: ./apps/istio/variants/default
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: istio-system
+---

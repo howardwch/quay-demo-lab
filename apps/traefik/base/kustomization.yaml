@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- 01-traefik-crd.yml
+- traefik.yml
+- ssl.yml
+
+images:
+- name: localhost/traefik
+  newName: docker.io/library/traefik
+  newTag: v2.9.6
+

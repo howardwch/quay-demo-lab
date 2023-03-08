@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../../base/
+- quay-config-secret.yml
+- nginx.yml
+
+images:
+- name: localhost/minio
+  newName: docker.io/minio/minio
+  newTag: latest
+- name: localhost/postgres-exporter
+  newName: docker.io/prometheuscommunity/postgres-exporter
+  newTag: latest
+- name: localhost/postgresql-10
+  newName: registry.redhat.io/rhel8/postgresql-10
+  newTag: 1-157
+- name: localhost/quay
+  newName: registry.redhat.io/quay/quay-rhel8
+  newTag: v3.7.8-5
+- name: localhost/bitnami-redis
+  newName: docker.io/bitnami/redis
+  newTag: latest
+- name: localhost/ocp-network-tools
+  newName: quay.io/openshift/origin-network-tools
+  newTag: latest
+- name: localhost/mc
+  newName: docker.io/minio/mc
+  newTag: latest

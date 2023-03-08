@@ -1,0 +1,86 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clairv4
+  labels:
+    app: clair
+spec:
+  ports:
+    - name: http-8080
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: http-8089
+      port: 8089
+      protocol: TCP
+      targetPort: 8089
+  selector:
+    app: clair
+  type: ClusterIP
+---
+apiVersion: v1
+data:
+  config.yaml: aW50cm9zcGVjdGlvbl9hZGRyOiA6ODA4OQpodHRwX2xpc3Rlbl9hZGRyOiA6ODA4MApsb2dfbGV2ZWw6IGRlYnVnCmluZGV4ZXI6CiAgY29ubnN0cmluZzogaG9zdD1wb3N0Z3Jlcy5jbGFpci5zdmMgcG9ydD01NDMyIGRibmFtZT1jbGFpciB1c2VyPWNsYWlyIHBhc3N3b3JkPWNsYWlyIHNzbG1vZGU9ZGlzYWJsZQogIHNjYW5sb2NrX3JldHJ5OiAxMAogIGxheWVyX3NjYW5fY29uY3VycmVuY3k6IDUKICBtaWdyYXRpb25zOiB0cnVlCm1hdGNoZXI6CiAgY29ubnN0cmluZzogaG9zdD1wb3N0Z3Jlcy5jbGFpci5zdmMgcG9ydD01NDMyIGRibmFtZT1jbGFpciB1c2VyPWNsYWlyIHBhc3N3b3JkPWNsYWlyIHNzbG1vZGU9ZGlzYWJsZQogIG1heF9jb25uX3Bvb2w6IDEwCiAgcnVuOiAiIgogIG1pZ3JhdGlvbnM6IHRydWUKICBpbmRleGVyX2FkZHI6IGNsYWlyLWluZGV4ZXIKbm90aWZpZXI6CiAgY29ubnN0cmluZzogaG9zdD1wb3N0Z3Jlcy5jbGFpci5zdmMgcG9ydD01NDMyIGRibmFtZT1jbGFpciB1c2VyPWNsYWlyIHBhc3N3b3JkPWNsYWlyIHNzbG1vZGU9ZGlzYWJsZQogIGRlbGl2ZXJ5OiAxbQogIHBvbGxfaW50ZXJ2YWw6IDVtCiAgbWlncmF0aW9uczogdHJ1ZQphdXRoOgogIHBzazoKICAgIGtleTogTVRVNVl6QTRZMlprTnpKb01RPT0KICAgIGlzczogWyJxdWF5Il0KIyB0cmFjaW5nIGFuZCBtZXRyaWNzCnRyYWNlOgogIG5hbWU6ICJqYWVnZXIiCiAgcHJvYmFiaWxpdHk6IDEKICBqYWVnZXI6CiAgICBhZ2VudF9lbmRwb2ludDogImxvY2FsaG9zdDo2ODMxIgogICAgc2VydmljZV9uYW1lOiAiY2xhaXIiCm1ldHJpY3M6CiAgbmFtZTogInByb21ldGhldXMiCg==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: clairv4-config-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clair
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clair
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "True"
+      labels:
+        app: clair
+        version: v1
+    spec:
+      containers:
+        - image: localhost/clair-rhel8:v3.7.8-1
+          imagePullPolicy: IfNotPresent
+          name: clair
+          env:
+            - name: CLAIR_CONF
+              value: /clair/config.yaml
+            - name: CLAIR_MODE
+              value: combo
+          ports:
+            - containerPort: 8080
+              name: clair-http
+              protocol: TCP
+            - containerPort: 8089
+              name: clair-intro
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /clair/
+              name: config
+            - mountPath: /var/run/certs
+              name: extra-ca-certs
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      restartPolicy: Always
+      volumes:
+        - name: config
+          secret:
+            secretName: clairv4-config-secret
+        - configMap:
+            defaultMode: 420
+            optional: true
+            name: extra-ca-certs
+            items:
+              - key: ca-bundle.crt
+                path: a0a5ac38.0
+                # openssl x509 -in quay.example.com.pem -noout -hash
+          name: extra-ca-certs

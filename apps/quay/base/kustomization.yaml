@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment-minio.yml
+- deployment-postgresql.yml
+- deployment-quay.yml
+- deployment-redis.yml
+- dnsmasq.yml
+- namespace.yml
+- pg-pvc.yml
+- pg-rbac.yml
+- pg-sa.yml
+- minio-job.yml
+- pg-extension.yml
+- pvc-minio-init.yml
+- extra-certs-job.yml 
+- extra-certs-rbac.yml 
+- extra-certs-sa.yml
+- ingress.yml
+- deployment-quay-mirror.yml
+- deployment-postgres-exporter.yml
+

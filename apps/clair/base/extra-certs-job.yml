@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    kustomize.toolkit.fluxcd.io/ignore: "true"
+  name: extra-cert-publish
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: extra-cert-publish
+        imagePullPolicy: IfNotPresent
+        image: localhost/ocp-network-tools
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        command:
+          - /bin/sh 
+          - -c
+          - oc delete -n ${NAMESPACE} configmap extra-ca-certs ; oc create -n ${NAMESPACE} configmap extra-ca-certs --from-literal=ca-bundle.crt="$(oc -n istio-system get secret/frontend-gateway -ojsonpath='{.data.ca\.crt}' | base64 -d )" --from-literal=service-ca.crt="$(oc -n istio-system get secret/frontend-gateway -ojsonpath='{.data.tls\.crt}' | base64 -d)"
+      restartPolicy: Never
+      serviceAccount: extra-cert-pusher-clair
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 60

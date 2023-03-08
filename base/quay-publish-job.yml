@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: populate-quay
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+        kustomize.toolkit.fluxcd.io/ignore: "true" 
+    spec:
+      containers:
+      - name: populate-quay
+        imagePullPolicy: IfNotPresent
+        image: localhost/quay-demo-publisher:latest
+        env:
+        - name: QUAY_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: TOKEN
+              name: quay-superuser-token
+        volumeMounts:
+          - mountPath: /etc/docker/certs.d/quay.example.com/
+            name: extra-ca-certs
+      restartPolicy: Never
+      volumes:
+        - configMap:
+            defaultMode: 420
+            optional: true
+            name: extra-ca-certs
+          name: extra-ca-certs
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+  backoffLimit: 0

@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+        flux.weave.works/ignore: "true"
+        kustomize.toolkit.fluxcd.io/ignore: "true" 
+    spec:
+      containers:
+      - name: postgres-extension
+        imagePullPolicy: IfNotPresent
+        image: localhost/postgresql-10:1-157
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PGUSER
+          value: postgres
+        - name: PGPASSWORD
+          value: changeme
+        - name: PGDATABASE
+          value: quay
+        - name: PGHOST
+          value: postgres.$(NAMESPACE).svc
+        command:
+          - /usr/bin/psql
+          - -c 
+          - "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+      restartPolicy: Never
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 60

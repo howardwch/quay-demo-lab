@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: dr-grafana
+spec:
+  host: grafana
+  subsets:
+  - labels:
+      version: v1
+    name: v1

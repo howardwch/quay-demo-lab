@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    quay-component: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      quay-component: redis
+  template:
+    metadata:
+      labels:
+        quay-component: redis
+    spec:
+      containers:
+      - image: localhost/bitnami-redis:latest
+        imagePullPolicy: IfNotPresent
+        name: redis
+        env:
+          - name: REDIS_PASSWORD
+            value: changeme
+        ports:
+          - containerPort: 6379
+            name: redis
+            protocol: TCP
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    quay-component: redis
+spec:
+  ports:
+    - name: redis
+      port: 6379
+      protocol: TCP
+      targetPort: 6379
+  selector:
+    quay-component: redis
+  type: ClusterIP

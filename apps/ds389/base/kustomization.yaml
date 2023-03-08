@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment.yml
+- ingress.yml
+- namespace.yml
+- pvc-ds389.yml
+- ds389-config-credentials.yml
+
+
+images:
+- name: localhost/ds389
+  newName: quay.io/rhn_support_milang/ds389
+  newTag: next

@@ -1,0 +1,1 @@
+oc create configmap provisioning --from-file=provisioning/dashboards/dashboards.yml --from-file=provisioning/dashboards/quay-monitoring.json --from-file=provisioning/datasources/prometheus.yml --dry-run=client -o yaml > provisioning.yml

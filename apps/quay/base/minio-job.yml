@@ -1,0 +1,75 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-init
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+        flux.weave.works/ignore: "true"
+        kustomize.toolkit.fluxcd.io/ignore: "true"
+    spec:
+      containers:
+      - name: minio-startup-wait
+        imagePullPolicy: IfNotPresent
+        image: localhost/mc
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        command:
+        - /bin/bash
+        - -c
+        - 'while ! curl -s -w "%{http_code}" http://minio.$(NAMESPACE).svc:9000/minio/health/live | grep 200 ; do echo "no 200" ; sleep 1 ; done'
+      - name: minio-config
+        imagePullPolicy: IfNotPresent
+        image: localhost/mc
+        env:
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MINIO_ROOT_PASSWORD
+              name: minio-admin
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              key: MINIO_ROOT_USER
+              name: minio-admin
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        command:
+          - /bin/mc
+          - alias
+          - set
+          - s3
+          - http://minio.$(NAMESPACE):9000
+          - $(MINIO_ROOT_USER)
+          - $(MINIO_ROOT_PASSWORD)
+          - --api
+          - "s3v4"
+          - --path
+          - "auto"
+        volumeMounts:
+        - mountPath: /root/.mc/
+          name: mc-base
+      - name: minio-create-bucket
+        imagePullPolicy: IfNotPresent
+        image: localhost/mc
+        command:
+          - /bin/mc
+          - mb
+          - s3/quay
+        volumeMounts:
+        - mountPath: /root/.mc/
+          name: mc-base
+      restartPolicy: Never
+      volumes:
+      - persistentVolumeClaim:
+          claimName: minio-init
+        name: mc-base
+  backoffLimit: 1
+  #ttlSecondsAfterFinished: 60

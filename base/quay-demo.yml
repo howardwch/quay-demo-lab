@@ -1,0 +1,80 @@
+--- 
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: ds389
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: ./apps/ds389/base
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: quay
+--- 
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: clair
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: ds389
+  interval: 5m0s
+  path: ./apps/clair/variants/mesh
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: clair
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: quay
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: clair
+  interval: 5m0s
+  path: ./apps/quay/variants/example.com/3.8
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: quay
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: ./apps/grafana/variants/example.com
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: monitoring
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: prometheus
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: ./apps/prometheus/variants/quay-demo
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: quay-demo-source
+  targetNamespace: monitoring
+---

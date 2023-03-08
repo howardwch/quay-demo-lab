@@ -1,0 +1,2780 @@
+apiVersion: v1
+data:
+  dashboards.yml: "apiVersion: 1\n\nproviders:\n- name: 'Prometheus'\n  orgId: 1\n
+    \ folder: ''\n  folderUid: ''\n  type: file\n  disableDeletion: false\n  editable:
+    true\n  updateIntervalSeconds: 600  \n  options:\n    path: /etc/grafana/provisioning/dashboards/\n"
+  prometheus.yml: |
+    # config file version
+    apiVersion: 1
+
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      orgId: 1
+      url: http://prometheus.monitoring.svc:9090
+      basicAuth: false
+      isDefault: true
+      version: 1
+      editable: true
+  quay-monitoring.json: |
+    {
+      "__elements": {},
+      "__requires": [
+        {
+          "type": "grafana",
+          "id": "grafana",
+          "name": "Grafana",
+          "version": "9.4.3"
+        },
+        {
+          "type": "panel",
+          "id": "heatmap",
+          "name": "Heatmap",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "piechart",
+          "name": "Pie chart",
+          "version": ""
+        },
+        {
+          "type": "datasource",
+          "id": "prometheus",
+          "name": "Prometheus",
+          "version": "1.0.0"
+        },
+        {
+          "type": "panel",
+          "id": "stat",
+          "name": "Stat",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "timeseries",
+          "name": "Time series",
+          "version": ""
+        }
+      ],
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 3,
+            "x": 0,
+            "y": 0
+          },
+          "id": 42,
+          "options": {
+            "displayLabels": [
+              "value",
+              "name"
+            ],
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_repository_rows{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "legendFormat": "total",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_security_scanning_unscanned_images_remaining{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "unscanned",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_repository_rows_unmirrored{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "unmirrored",
+              "range": true,
+              "refId": "C"
+            }
+          ],
+          "title": "Repositories/Scanned",
+          "type": "piechart"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 3,
+            "x": 3,
+            "y": 0
+          },
+          "id": 46,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.4.3",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_user_rows{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "legendFormat": "Users",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_org_rows{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "Organizations",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_robot_rows{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "Robots",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(quay_repository_rows{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "Repositories",
+              "range": true,
+              "refId": "D"
+            }
+          ],
+          "title": "Stats",
+          "type": "stat"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 68,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 3,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 5,
+            "x": 6,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum by (status) ( rate(quay_registry_image_pulls_total{instance=\"$quay\",job=\"$quayjob\"}[5m]) )",
+              "legendFormat": "pull",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum by (status) ( rate(quay_registry_image_push_total{instance=\"$quay\",job=\"$quayjob\"}[5m]) )",
+              "hide": false,
+              "legendFormat": "push",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Pull/Push statistics",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 56,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 4,
+            "x": 11,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "sum by (process_name) ( rate(quay_db_connect_calls_total{instance=\"$quay\",job=\"$quayjob\"}[5m]) )",
+              "instant": false,
+              "legendFormat": "{{label_name}}",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum by (process_name) ( rate(quay_db_close_calls_total{instance=\"$quay\",job=\"$quayjob\"}[5m]) )",
+              "hide": false,
+              "legendFormat": "{{label_name}}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Database Statistics total/close calls",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 66,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 3,
+            "x": 15,
+            "y": 0
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum by (process_name, success) ( rate(quay_authentication_attempts_total{instance=\"$quay\",job=\"$quayjob\"}[5m]))",
+              "legendFormat": "{{process_name}} {{success}}",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum by (status, process_name) ( rate (quay_request_duration_seconds_count{instance=\"$quay\", job=\"$quayjob\"}[5m]))",
+              "hide": false,
+              "legendFormat": "{{process_name}} {{status}}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Authentication attempts",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 62,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 3,
+            "x": 18,
+            "y": 0
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum( rate(quay_chunk_upload_duration_seconds_count{instance=\"$quay\",job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "legendFormat": "chunk durations seconds",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum( rate(quay_multipart_uploads_completed_total{instance=\"$quay\",job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "multiparts total",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Chunk/Multipart Upload statistics",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 55,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 3,
+            "x": 21,
+            "y": 0
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum ( rate(quay_registry_image_pulled_estimated_bytes_total{instance=\"$quay\",job=\"$quayjob\"}[5m]))  OR on() vector(0)",
+              "legendFormat": "pull",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum ( rate(quay_registry_image_pushed_bytes_total{instance=\"$quay\",job=\"$quayjob\"}[5m]))  OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "push",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Image push/pull bytes",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 3,
+            "x": 0,
+            "y": 6
+          },
+          "id": 44,
+          "options": {
+            "displayLabels": [
+              "percent"
+            ],
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.3.6",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sum(rate(quay_queue_item_gets_total{instance=\"$quay\", job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "legendFormat": "total",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(rate(quay_queue_item_deletes_total{instance=\"$quay\", job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "deletes",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(rate(quay_queue_item_gets_total{instance=\"$quay\", job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "gets",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(rate(quay_queue_item_puts_total{instance=\"$quay\", job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "puts",
+              "range": true,
+              "refId": "D"
+            },
+            {
+              "editorMode": "code",
+              "expr": "sum(rate(quay_queue_items_available{instance=\"$quay\", job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "legendFormat": "available",
+              "range": true,
+              "refId": "E"
+            }
+          ],
+          "title": "Work Queue",
+          "type": "piechart"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 53,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 3,
+            "x": 3,
+            "y": 6
+          },
+          "id": 48,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.3.6",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "rate(process_cpu_seconds_total{instance=\"$quay\",job=\"$quayjob\"}[5m])",
+              "legendFormat": "{{process_name}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Process CPU seconds",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 3,
+            "x": 0,
+            "y": 12
+          },
+          "id": 12,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "sort ( rate(promhttp_metric_handler_requests_total{instance=\"$clair\",job=\"$clairjob\"}[5m]) )",
+              "legendFormat": "{{code}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Clair HTTP response codes",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 30,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 3,
+            "y": 12
+          },
+          "id": 26,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum by (application_name) (pgxpool_idle_conns{instance=\"$clair\",job=\"$clairjob\",application_name=\"libindex\"}) OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "idle",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum by (application_name) (pgxpool_max_conns{instance=\"$clair\",job=\"$clairjob\",application_name=\"libindex\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "max",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum by (application_name) (pgxpool_total_conns{instance=\"$clair\",job=\"$clairjob\",application_name=\"libindex\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "total",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum by (application_name) (pgxpool_acquired_conns{instance=\"$clair\",job=\"$clairjob\",application_name=\"libindex\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "acquired",
+              "range": true,
+              "refId": "D"
+            }
+          ],
+          "title": "Connections (Indexer)",
+          "type": "timeseries"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-RdYlGr"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 29,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 7,
+            "y": 12
+          },
+          "id": 28,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(avg_over_time(quay_db_pooled_connections_available{instance=\"$quay\",job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "total",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(avg_over_time(quay_db_pooled_connections_in_use{instance=\"$quay\",job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "in_use",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(quay_db_connect_calls_total{instance=\"$quay\",job=\"$quayjob\"}[5m])) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "calls total",
+              "range": true,
+              "refId": "C"
+            }
+          ],
+          "title": "Quay Database state",
+          "type": "timeseries"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 11,
+            "y": 12
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 30,
+          "legend": {
+            "show": false
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": false
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_vulnstore_getvulnerabilities_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le) OR on() vector(0)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Get vulnerabilities latency",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 15,
+            "y": 12
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 32,
+          "legend": {
+            "show": false
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": false
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_vulnstore_getupdateoperations_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le) OR on() vector(0)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "D"
+            }
+          ],
+          "title": "Get update operations latency",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 5,
+            "x": 19,
+            "y": 12
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 34,
+          "legend": {
+            "show": false
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": false
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_vulnstore_updatevulnerabilities_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le) ",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "E"
+            }
+          ],
+          "title": "Update vulnerabilities latency",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 0,
+            "y": 22
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 14,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_indexer_setindexreport_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Set index_report query duration",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "IndexReport": {
+                    "aggregations": [
+                      "lastNotNull"
+                    ]
+                  },
+                  "LayerScanned": {
+                    "aggregations": []
+                  },
+                  "ManifestScanned": {
+                    "aggregations": []
+                  },
+                  "PersistManifest": {
+                    "aggregations": []
+                  },
+                  "RegisterScanners": {
+                    "aggregations": []
+                  },
+                  "SetIndexReport": {
+                    "aggregations": []
+                  },
+                  "Time": {
+                    "aggregations": [
+                      "sum"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 4,
+            "y": 22
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 16,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_indexer_layerscanned_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Layer scanned query duration",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "IndexReport": {
+                    "aggregations": [
+                      "lastNotNull"
+                    ]
+                  },
+                  "LayerScanned": {
+                    "aggregations": []
+                  },
+                  "ManifestScanned": {
+                    "aggregations": []
+                  },
+                  "PersistManifest": {
+                    "aggregations": []
+                  },
+                  "RegisterScanners": {
+                    "aggregations": []
+                  },
+                  "SetIndexReport": {
+                    "aggregations": []
+                  },
+                  "Time": {
+                    "aggregations": [
+                      "sum"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 8,
+            "y": 22
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 18,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_indexer_persistmanifest_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "D"
+            }
+          ],
+          "title": "Persist manifest query duration",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "IndexReport": {
+                    "aggregations": [
+                      "lastNotNull"
+                    ]
+                  },
+                  "LayerScanned": {
+                    "aggregations": []
+                  },
+                  "ManifestScanned": {
+                    "aggregations": []
+                  },
+                  "PersistManifest": {
+                    "aggregations": []
+                  },
+                  "RegisterScanners": {
+                    "aggregations": []
+                  },
+                  "SetIndexReport": {
+                    "aggregations": []
+                  },
+                  "Time": {
+                    "aggregations": [
+                      "sum"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 12,
+            "y": 22
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 20,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_indexer_manifestscanned_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "C"
+            }
+          ],
+          "title": "Manifest scanned query duration",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "IndexReport": {
+                    "aggregations": [
+                      "lastNotNull"
+                    ]
+                  },
+                  "LayerScanned": {
+                    "aggregations": []
+                  },
+                  "ManifestScanned": {
+                    "aggregations": []
+                  },
+                  "PersistManifest": {
+                    "aggregations": []
+                  },
+                  "RegisterScanners": {
+                    "aggregations": []
+                  },
+                  "SetIndexReport": {
+                    "aggregations": []
+                  },
+                  "Time": {
+                    "aggregations": [
+                      "sum"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 16,
+            "y": 22
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 22,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_indexer_registerscanners_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "E"
+            }
+          ],
+          "title": "Register scanners query duration",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "IndexReport": {
+                    "aggregations": [
+                      "lastNotNull"
+                    ]
+                  },
+                  "LayerScanned": {
+                    "aggregations": []
+                  },
+                  "ManifestScanned": {
+                    "aggregations": []
+                  },
+                  "PersistManifest": {
+                    "aggregations": []
+                  },
+                  "RegisterScanners": {
+                    "aggregations": []
+                  },
+                  "SetIndexReport": {
+                    "aggregations": []
+                  },
+                  "Time": {
+                    "aggregations": [
+                      "sum"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateOranges",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 4,
+            "x": 20,
+            "y": 22
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 24,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "decimals": 0,
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(claircore_indexer_setindexfinished_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\"}[5m])) by (le)",
+              "format": "heatmap",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "{{ le }}",
+              "range": true,
+              "refId": "F"
+            }
+          ],
+          "title": "Set index finished query duration",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "IndexReport": {
+                    "aggregations": [
+                      "lastNotNull"
+                    ]
+                  },
+                  "LayerScanned": {
+                    "aggregations": []
+                  },
+                  "ManifestScanned": {
+                    "aggregations": []
+                  },
+                  "PersistManifest": {
+                    "aggregations": []
+                  },
+                  "RegisterScanners": {
+                    "aggregations": []
+                  },
+                  "SetIndexReport": {
+                    "aggregations": []
+                  },
+                  "Time": {
+                    "aggregations": [
+                      "sum"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "decimals": 0,
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 32
+          },
+          "id": 36,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum by (job)(go_memstats_heap_inuse_bytes{instance=~\"($quay|$clair)\",job=~\"($quayjob|$clairjob)\"})",
+              "interval": "",
+              "legendFormat": "{{ job }}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Memory",
+          "type": "timeseries"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateGreys",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 6,
+            "y": 32
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 38,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(increase(clair_http_indexerv1_request_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\",method=\"post\", handler=\"/indexer/api/v1/index_report\", code=\"201\"} [5m])) by (le)",
+              "format": "heatmap",
+              "instant": false,
+              "interval": "1",
+              "legendFormat": "{{ le }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Create Index Report Request Latency",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        },
+        {
+          "cards": {},
+          "color": {
+            "cardColor": "#b4ff00",
+            "colorScale": "linear",
+            "colorScheme": "interpolateGreys",
+            "exponent": 0.5,
+            "mode": "opacity"
+          },
+          "dataFormat": "tsbuckets",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 10,
+            "x": 14,
+            "y": 32
+          },
+          "heatmap": {},
+          "hideZeroBuckets": true,
+          "highlightCards": true,
+          "id": 40,
+          "legend": {
+            "show": true
+          },
+          "maxDataPoints": 50,
+          "options": {
+            "calculate": false,
+            "calculation": {},
+            "cellGap": 2,
+            "cellValues": {},
+            "color": {
+              "exponent": 0.5,
+              "fill": "#b4ff00",
+              "mode": "opacity",
+              "reverse": false,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 128
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": true
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "showValue": "never",
+            "tooltip": {
+              "show": true,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "reverse": false,
+              "unit": "s"
+            }
+          },
+          "pluginVersion": "9.4.3",
+          "reverseYBuckets": false,
+          "targets": [
+            {
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(increase(clair_http_indexerv1_request_duration_seconds_bucket{instance=\"$clair\",job=\"$clairjob\", method=\"get\", handler=\"/indexer/api/v1/index_state\"} [5m])) by (le)",
+              "format": "heatmap",
+              "instant": false,
+              "interval": "1",
+              "legendFormat": "{{ le }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Indexer State Request Latency",
+          "tooltip": {
+            "show": true,
+            "showHistogram": false
+          },
+          "type": "heatmap",
+          "xAxis": {
+            "show": true
+          },
+          "yAxis": {
+            "format": "s",
+            "logBase": 1,
+            "show": true
+          },
+          "yBucketBound": "auto"
+        }
+      ],
+      "refresh": "1m",
+      "revision": 1,
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {},
+            "definition": "go_info",
+            "hide": 0,
+            "includeAll": false,
+            "label": "quay instance",
+            "multi": false,
+            "name": "quay",
+            "options": [],
+            "query": {
+              "query": "go_info",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/instance=\"(?<text>quay)\",job=\"(?<value>quay)\"/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {},
+            "definition": "go_info",
+            "hide": 0,
+            "includeAll": false,
+            "label": "clair instance",
+            "multi": false,
+            "name": "clair",
+            "options": [],
+            "query": {
+              "query": "go_info",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/instance=\"(?<text>clair)\",job=\"(?<value>clair)\"/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {},
+            "definition": "go_info",
+            "hide": 0,
+            "includeAll": false,
+            "label": "quay job",
+            "multi": false,
+            "name": "quayjob",
+            "options": [],
+            "query": {
+              "query": "go_info",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/job=\"(quay?)\"/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {},
+            "definition": "go_info",
+            "hide": 0,
+            "includeAll": false,
+            "label": "clair job",
+            "multi": false,
+            "name": "clairjob",
+            "options": [],
+            "query": {
+              "query": "go_info",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/instance=\"(.*?)\",job=\"clair\"/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-3h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Quay Monitoring",
+      "uid": "7TZRd214k",
+      "version": 2,
+      "weekStart": ""
+    }
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: provisioning
