@@ -1,4 +1,3 @@
-dn: cn=Amy Burns,ou=People,dc=example,dc=com
 changetype: modify
 replace: userPassword
 userPassword:: e1BCS0RGMl9TSEEyNTZ9QUFBSUFQMno3SHdWeG8zYVUzSkZZUndYeFhnU1NJaXp

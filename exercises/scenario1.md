@@ -145,7 +145,7 @@ pwdhash: password ok.
     ```
 now our password should be working again from the cached auth.json file in `/run/user/$(id -u)/containers/auth.json
 ```
-skopeo copy docker://docker.io/alpine:latest docker://quay.example.com/sarahudson/alpine:latest 
+skopeo copy docker://docker.io/alpine:latest docker://quay.example.com/${USER}/alpine:latest 
 Getting image source signatures
 Copying blob 63b65145d645 skipped: already exists  
 Copying config b2aa39c304 done  

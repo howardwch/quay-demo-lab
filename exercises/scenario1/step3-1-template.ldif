@@ -1,5 +1,3 @@
-ldapmodify -x -H 'ldap://localhost:10389' -D 'cn=Directory Manager' -w changeme 
-dn: cn=Amy Burns,ou=People,dc=example,dc=com
 changetype: modify
 replace: userPassword
 userPassword:: e1BCS0RGMl9TSEEyNTZ9QUFBSUFGeGRlQktOYS9DUFVLT3ZIVGdZU0w2bFkyQ1M
