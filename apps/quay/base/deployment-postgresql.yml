@@ -57,7 +57,7 @@ spec:
           successThreshold: 1
           failureThreshold: 5
         volumeMounts:
-        - mountPath: /var/lib/postgresql
+        - mountPath: /var/lib/pgsql
           name: pvc-pq
         - mountPath: /usr/share/container-scripts/postgresql/start/extension.sh
           name: pg-extension
