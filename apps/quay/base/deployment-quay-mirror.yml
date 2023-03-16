@@ -52,36 +52,6 @@ spec:
             - mountPath: /etc/dnsmasq.conf
               name: dnsmasq
               subPath: dnsmasq.conf
-          livenessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /health/instance
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
-          readinessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /health/instance
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
-          startupProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /health/instance
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
       dnsPolicy: ClusterFirst
       dnsConfig:
         options:
