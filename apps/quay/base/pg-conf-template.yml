@@ -10,9 +10,9 @@ data:
     Default: 32MB\nshared_buffers = ${POSTGRESQL_SHARED_BUFFERS}\n\n# Sets the planner's
     assumption about the effective size of the disk cache that is available to a single
     query\neffective_cache_size = ${POSTGRESQL_EFFECTIVE_CACHE_SIZE}\n\ntcp_keepalives_idle
-    = ${POSTGRESQL_KEEPALIVE_IDLE:-30}\t\t\t# TCP_KEEPIDLE, in seconds;\ntcp_keepalives_interval
-    = ${POSTGRESQL_KEEPALIVE_INTERVAL:-10}\t\t# TCP_KEEPINTVL, in seconds;\ntcp_keepalives_count
-    = ${POSTGRESQL_KEEPALIVE_COUNT:-3}\t\t\t# TCP_KEEPCNT;\n"
+    = 30\t\t\t# TCP_KEEPIDLE, in seconds;\ntcp_keepalives_interval
+    = 10\t\t# TCP_KEEPINTVL, in seconds;\ntcp_keepalives_count
+    = 3\t\t\t# TCP_KEEPCNT;\n"
 kind: ConfigMap
 metadata:
   creationTimestamp: null
