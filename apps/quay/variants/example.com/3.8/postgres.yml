@@ -1,0 +1,15 @@
+kind: DestinationRule
+apiVersion: networking.istio.io/v1beta1
+metadata:
+  name: postgres
+  namespace: quay
+spec:
+  host: postgres.quay.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 0.010s
+        tcpKeepalive:
+          time: 7200s
+          interval: 75s

@@ -5,3 +5,4 @@ resources:
 - quay.yml
 - minio.yml
 - quay-mirror.yml
+- postgres.yml

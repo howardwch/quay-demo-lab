@@ -11,6 +11,31 @@ items:
     - labels:
         version: v1
       name: v1
+    trafficPolicy:
+      connectionPool:
+        tcp:
+          maxConnections: 100
+          connectTimeout: 0.030s
+          tcpKeepalive:
+            time: 7200s
+            interval: 75s
+        http:
+          idleTimeout: 0.030s
+- apiVersion: networking.istio.io/v1beta1
+  kind: DestinationRule
+  metadata:
+    name: postgres
+    namespace: clair
+  spec:
+    host: postgres.clair.svc.cluster.local
+    trafficPolicy:
+      connectionPool:
+        tcp:
+          maxConnections: 100
+          connectTimeout: 0.030s
+          tcpKeepalive:
+            time: 7200s
+            interval: 75s
 - apiVersion: networking.istio.io/v1beta1
   kind: VirtualService
   metadata:
