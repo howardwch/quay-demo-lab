@@ -13,6 +13,8 @@ resources:
 - extra-certs-rbac.yml
 - extra-certs-sa.yml
 - deployment-postgres-exporter.yml
+- pg-conf-template.yml
+- clair-config-secret.yml
 
 images:
 - name: localhost/clair-rhel8

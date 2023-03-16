@@ -13,10 +13,7 @@ spec:
     matchLabels:
       app: postgres
   strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       annotations:
@@ -62,6 +59,9 @@ spec:
         - mountPath: /usr/share/container-scripts/postgresql/start/extension.sh
           name: pg-extension
           subPath: extension.sh
+        - mountPath: /usr/share/container-scripts/postgresql/openshift-custom-postgresql.conf.template
+          name: pg-conf-template
+          subPath: openshift-custom-postgresql.conf.template
       serviceAccount: postgres
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -79,7 +79,13 @@ spec:
             path: extension.sh
           defaultMode: 0755    
           name: pg-extension
-
+      - name: pg-conf-template
+        configMap:
+          items:
+          - key: openshift-custom-postgresql.conf.template
+            path: openshift-custom-postgresql.conf.template
+          defaultMode: 0755
+          name: pg-conf-template
 ---
 apiVersion: v1
 kind: Service
