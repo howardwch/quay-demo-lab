@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  openshift-custom-postgresql.conf.template: "#\n# Custom OpenShift configuration.\n#\n#
+    NOTE: This file is rewritten every time the container is started!\n#       Changes
+    to this file will be overwritten.\n#\n\n# Listen on all interfaces.\nlisten_addresses
+    = '*'\n\n# Determines the maximum number of concurrent connections to the database
+    server. Default: 100\nmax_connections = ${POSTGRESQL_MAX_CONNECTIONS}\n\n# Allow
+    each connection to use a prepared transaction\nmax_prepared_transactions = ${POSTGRESQL_MAX_PREPARED_TRANSACTIONS}\n\n#
+    Sets the amount of memory the database server uses for shared memory buffers.
+    Default: 32MB\nshared_buffers = ${POSTGRESQL_SHARED_BUFFERS}\n\n# Sets the planner's
+    assumption about the effective size of the disk cache that is available to a single
+    query\neffective_cache_size = ${POSTGRESQL_EFFECTIVE_CACHE_SIZE}\n\ntcp_keepalives_idle
+    = ${POSTGRESQL_KEEPALIVE_IDLE:-30}\t\t\t# TCP_KEEPIDLE, in seconds;\ntcp_keepalives_interval
+    = ${POSTGRESQL_KEEPALIVE_INTERVAL:-10}\t\t# TCP_KEEPINTVL, in seconds;\ntcp_keepalives_count
+    = ${POSTGRESQL_KEEPALIVE_COUNT:-3}\t\t\t# TCP_KEEPCNT;\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: pg-conf-template
