@@ -96,7 +96,7 @@ we pick one of the images (in this example **ubi9**) to exercise on.
 	 - [Open Container Initiative (OCI) Specifications](https://github.com/opencontainers/image-spec)
 
  - verify image size and file system size are equal
-   the total size (sum all size attributes) should equal the file system usage.
+   the total size (sum all size attributes) should equal the file system usage. This needs to match for the Manifest to be accepted when uploading.
 
 	```
 	cat manifest.json | \
@@ -130,9 +130,10 @@ we pick one of the images (in this example **ubi9**) to exercise on.
 	    [.. output omitted ..]
 	```
 
-- evaluate the image configuration layer of our entrypoint.sh file we added to the Docker image. We have two candidates of layers from the size point of view bot are ~2/2.5k in size and represent the requirements.txt and the entrypoint.sh file
+- evaluate the image configuration layer of our entrypoint.sh file we added to the Docker image. We have two candidates of layers from the size point of view both are ~2/2.5k in size and represent the requirements.txt and the entrypoint.sh file
 	
 	```
+        # in case you don't get the entrypoint.sh string in the layer you need to check on the next candidate 
 	zcat 259ad5f5e699015b2fa35e28f78006a95aebaa905798df509370146ea6917d4d | head
 	
 	entrypoint.sh0100755000000000000000000000024114402304216013620 0ustar00rootroot00000000000000#!/bin/bash
@@ -149,7 +150,7 @@ we pick one of the images (in this example **ubi9**) to exercise on.
 	    gzip -c > 259ad5f5e699015b2fa35e28f78006a95aebaa905798df509370146ea6917d4d.malware
 	```
 
-	now replace the original lay with the tampered layer and update the manifest according to the size change (the original size is 226)
+	now replace the original layer with the tampered layer and update the manifest according to the size change (the original size is 226)
 
 
 	```
@@ -210,7 +211,7 @@ mc ls s3/quay/datastorage/registry/sha256/25/
 [2023-03-18 12:37:51 CET]   226B STANDARD 259ad5f5e699015b2fa35e28f78006a95aebaa905798df509370146ea6917d4d.bkp
 ```
 
-now with that, we consider a normal user trying to fetch our image with the tampered layer. With caching on podman we utilize skopeo copy instead
+with that, we consider a normal user trying to fetch our image with the tampered layer. With caching on podman we utilize skopeo copy instead
 
 ```
 skopeo copy docker://quay.example.com/${USER}/quay-demo-publisher:ubi${v} dir://tmp/ubi9-tampered
@@ -248,7 +249,7 @@ Copying blob 38cac6677f2b done
 FATA[0005] writing blob: Patch "https://quay.example.com/v2/daniel58/quay-demo-publisher/blobs/uploads/8ba5bc43-f8f5-45ad-b3a7-291f86334c6b": happened during read: Digest did not match, expected sha256:259ad5f5e699015b2fa35e28f78006a95aebaa905798df509370146ea6917d4d, got sha256:3902e0f415fa6b6be5ec98e4c14bb4c4b99cb2498747e6d2067e188c7cd23212 
 ```
 
-as we can see, Quay verifies each layer on it's sha256 sum as well.
+as we can see, Quay verifies each layer on it's sha256 sum during upload as well.
 
 ##### how to still succeed
 
