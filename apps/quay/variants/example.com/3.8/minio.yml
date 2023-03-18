@@ -60,6 +60,14 @@ items:
     - labels:
         version: v1
       name: v1
+    trafficPolicy:
+      connectionPool:
+        tcp:
+          maxConnections: 100
+          connectTimeout: 3s
+          tcpKeepalive:
+            time: 60s
+            interval: 10s
 kind: List
 metadata:
   resourceVersion: ""

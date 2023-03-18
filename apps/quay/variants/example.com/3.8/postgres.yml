@@ -9,7 +9,7 @@ spec:
     connectionPool:
       tcp:
         maxConnections: 100
-        connectTimeout: 0.010s
+        connectTimeout: 3s
         tcpKeepalive:
-          time: 7200s
-          interval: 75s
+          time: 60s
+          interval: 30s

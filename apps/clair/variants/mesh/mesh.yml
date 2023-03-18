@@ -15,10 +15,10 @@ items:
       connectionPool:
         tcp:
           maxConnections: 100
-          connectTimeout: 0.030s
+          connectTimeout: 3s
           tcpKeepalive:
-            time: 7200s
-            interval: 75s
+            time: 60s
+            interval: 10s
         http:
           idleTimeout: 0.030s
 - apiVersion: networking.istio.io/v1beta1
@@ -32,10 +32,10 @@ items:
       connectionPool:
         tcp:
           maxConnections: 100
-          connectTimeout: 0.030s
+          connectTimeout: 30s
           tcpKeepalive:
-            time: 7200s
-            interval: 75s
+            time: 60s
+            interval: 10s
 - apiVersion: networking.istio.io/v1beta1
   kind: VirtualService
   metadata:

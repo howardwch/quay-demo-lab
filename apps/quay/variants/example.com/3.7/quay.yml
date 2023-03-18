@@ -55,12 +55,12 @@ items:
       connectionPool:
         tcp:
           maxConnections: 100
-          connectTimeout: 0.030s
+          connectTimeout: 3s
           tcpKeepalive:
-            time: 7200s
-            interval: 75s
+            time: 60s
+            interval: 10s
         http:
-          idleTimeout: 0.030s
+          idleTimeout: 30s
 kind: List
 metadata:
   resourceVersion: ""
