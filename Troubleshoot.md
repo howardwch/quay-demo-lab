@@ -14,7 +14,7 @@ Without implementing the mentioned checks to recycle the deployment you'll see f
 * Quay will re-establish at least one connection returning functionality at some point
 * depending on how many thread/workers and connections you have, you'll face a lot of broken uploads, 500pages on the UI until Quay recovers.
 
-Same will behavior will be seen with Clair utilizing the same database.
+Same behavior will be seen with Clair utilizing the same database.
 Which time frame can we expect to recover without recycling the deployment ?
 
 For Quay, roughly ~5 minutes  depending on what happens to your database. Quay does recover, depending on how many workers you have configured it takes n^ requests to do so but you might still have processes not grabbing a new DB connection at all.
@@ -119,4 +119,80 @@ $ oc -n quay logs deploy/quay | awk '/peewee.InterfaceError/ { print $1 }' | sor
 ```
 
 Even when setting `max_connections` in config.yaml `DB_CONNECTION_POOLING` is not turned on as the max_connections setting affects `peewee` handling connections out in general and not limited to pooling mode.
+
+## exercise failing Clair Database
+
+ToDo: Clair health checks
+
+### tuning connection parameters to optimize Clair behavior
+
+First, we need to understand which components are involved in a particular deployment:
+* are there Firewalls ?
+* are there Load Balancers ?
+* which path through the Network does which component take ?
+
+We now assume a scenario where each component goes through a Load Balancer/Proxy.
+
+* Clair -> tcp(1) connection -> Load Balancer -> tcp(2) connection -> Postgresql
+* Clair -> tcp(3) connection -> Load Balancer -> tcp(4) connection -> Redis
+* Clair -> tcp(5) connection -> Load Balancer -> tcp(6) connection -> Storage
+
+FYI, the number next to `tcp` indicates who creates/initiates a connection. Load Balancer/Proxies tend to open separate connections to the backend Pools of a service to apply various optimizations or parameters to the TCP connection.
+
+For tuning as example a Postgresql connection that means:
+* settings on Clair for the tcp connection
+* settings on Load Balancer for the tcp connection
+* settings on Postgresql for tcp connection
+
+The connection parameters you are looking for are:
+* keepalives
+* keepalives_idle
+* keepalives_count
+* keepalives_interval
+
+For Clair we need to utilize the `DB_URI` syntax in config.yaml.
+Example setting for sending every 10th second a Keepalive package with the maximum loosing 3 of them and not receiving for maximum 30seconds a Keepalive package from the remote.
+
+```
+[.. output omitted ..]
+indexer:
+  connstring: host=postgres.clair.svc port=5432 dbname=clair user=clair password=clair sslmode=disable keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=3 tcp_user_timeout=10
+  scanlock_retry: 10
+  layer_scan_concurrency: 5
+  migrations: true
+matcher:
+  connstring: host=postgres.clair.svc port=5432 dbname=clair user=clair password=clair sslmode=disable keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=3 tcp_user_timeout=10
+  max_conn_pool: 50
+  run: ""
+  migrations: true
+  indexer_addr: clair-indexer
+notifier:
+  connstring: host=postgres.clair.svc port=5432 dbname=clair user=clair password=clair sslmode=disable keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=3 tcp_user_timeout=10
+  delivery: 1m
+  poll_interval: 5m
+  migrations: true
+auth:
+[.. output omitted ..]
+```
+
+```
+NOTE: these should match the configuration on the Load Balancer
+```
+
+#### postgresql connection tuning
+
+When looking at postgresql the settings for keepalives are located in `postgresql.conf` and or any `include` configuration.
+
+```
+tcp_keepalives_idle = 30                        # TCP_KEEPIDLE, in seconds;
+tcp_keepalives_interval = 10            # TCP_KEEPINTVL, in seconds;
+tcp_keepalives_count = 3                        # TCP_KEEPCNT;
+```
+
+```
+NOTE: these should match the configuration on the Load Balancer.
+      For socket based connection keepalives are not considered at all.
+```
+
+
 
