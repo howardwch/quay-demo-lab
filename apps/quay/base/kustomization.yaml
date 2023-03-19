@@ -20,3 +20,10 @@ resources:
 - deployment-quay-mirror.yml
 - deployment-postgres-exporter.yml
 - pg-conf-template.yml
+- deployment-quay-health.yml
+
+images:
+- name: localhost/quay-health-monitor:latest
+  newName: quay.io/rhn_support_milang/quay-health-monitor:latest
+  newTag: latest
+

@@ -122,7 +122,7 @@ Even when setting `max_connections` in config.yaml `DB_CONNECTION_POOLING` is no
 
 ## exercise failing Clair Database
 
-ToDo: Clair health checks
+Clair health check endpoint is exposed at `http://clair:8089/healthz` 
 
 ### tuning connection parameters to optimize Clair behavior
 
@@ -150,34 +150,7 @@ The connection parameters you are looking for are:
 * keepalives_count
 * keepalives_interval
 
-For Clair we need to utilize the `DB_URI` syntax in config.yaml.
-Example setting for sending every 10th second a Keepalive package with the maximum loosing 3 of them and not receiving for maximum 30seconds a Keepalive package from the remote.
-
-```
-[.. output omitted ..]
-indexer:
-  connstring: host=postgres.clair.svc port=5432 dbname=clair user=clair password=clair sslmode=disable keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=3 tcp_user_timeout=10
-  scanlock_retry: 10
-  layer_scan_concurrency: 5
-  migrations: true
-matcher:
-  connstring: host=postgres.clair.svc port=5432 dbname=clair user=clair password=clair sslmode=disable keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=3 tcp_user_timeout=10
-  max_conn_pool: 50
-  run: ""
-  migrations: true
-  indexer_addr: clair-indexer
-notifier:
-  connstring: host=postgres.clair.svc port=5432 dbname=clair user=clair password=clair sslmode=disable keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=3 tcp_user_timeout=10
-  delivery: 1m
-  poll_interval: 5m
-  migrations: true
-auth:
-[.. output omitted ..]
-```
-
-```
-NOTE: these should match the configuration on the Load Balancer
-```
+**For Clair we cannot tune the connection string as Clair does not support other parameters thane sslmode**
 
 #### postgresql connection tuning
 

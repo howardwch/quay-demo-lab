@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quay-health-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quay-health-monitor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: quay-health-monitor
+        version: v1
+    spec:
+      containers:
+        - image: localhost/quay-health-monitor:latest
+          imagePullPolicy: IfNotPresent
+          name: quay-health-monitor
+          env:
+            - name: QUAY_HEALTH_URI
+              value: http://quay:8080
+            - name: QUAY_PROM_URI
+              value: http://quay:9091
+            - name: INTERVAL
+              value: "2"
+            - name: QUAY_HOST
+              value: "quay"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always

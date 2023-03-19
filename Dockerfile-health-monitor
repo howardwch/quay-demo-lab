@@ -1,0 +1,15 @@
+FROM registry.access.redhat.com/ubi9/python-39
+
+USER 0
+COPY health-monitor.py /tmp/src/app.py
+COPY health-monitor-requirements.txt /tmp/src/requirements.txt
+RUN /usr/bin/fix-permissions /tmp/src
+USER 1001
+
+EXPOSE 8080
+
+# Install the dependencies
+RUN /usr/libexec/s2i/assemble
+
+# Set the default command for the resulting image
+CMD /opt/app-root/src/app.py
