@@ -42,10 +42,6 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
-        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -156,10 +152,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -185,13 +177,14 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "textMode": "value_and_name"
       },
       "pluginVersion": "9.4.3",
       "targets": [
         {
           "editorMode": "code",
           "expr": "sum(quay_user_rows{instance=\"$quay\", job=\"$quayjob\"}) OR on() vector(0)",
+          "hide": false,
           "legendFormat": "Users",
           "range": true,
           "refId": "A"
@@ -777,7 +770,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
           "custom": {
             "axisCenteredZero": false,
@@ -786,8 +779,8 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 53,
-            "gradientMode": "opacity",
+            "fillOpacity": 27,
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -795,12 +788,12 @@
             },
             "lineInterpolation": "linear",
             "lineWidth": 1,
-            "pointSize": 2,
+            "pointSize": 3,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -810,20 +803,19 @@
             }
           },
           "mappings": [],
+          "max": 1,
+          "min": 0,
+          "noValue": "-",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
-          "unit": "s"
+          "unit": "none"
         },
         "overrides": []
       },
@@ -833,7 +825,7 @@
         "x": 3,
         "y": 6
       },
-      "id": 48,
+      "id": 50,
       "options": {
         "legend": {
           "calcs": [],
@@ -846,17 +838,25 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.3.6",
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(process_cpu_seconds_total{instance=\"$quay\",job=\"$quayjob\"}[5m])",
-          "legendFormat": "{{process_name}}",
+          "expr": "sum(quay_health_status{status_code=\"200\"})",
+          "hide": false,
+          "legendFormat": "healthy",
           "range": true,
           "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(quay_health_status{status_code=\"503\"}) or vector(0)",
+          "hide": false,
+          "legendFormat": "failure",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Process CPU seconds",
+      "title": "Quay health state",
       "type": "timeseries"
     },
     {
@@ -2408,7 +2408,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
+        "w": 3,
         "x": 0,
         "y": 32
       },
@@ -2437,6 +2437,92 @@
         }
       ],
       "title": "Memory",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 53,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 2,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 3,
+        "x": 3,
+        "y": 32
+      },
+      "id": 48,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "rate(process_cpu_seconds_total{instance=\"$quay\",job=\"$quayjob\"}[5m])",
+          "legendFormat": "{{process_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Process CPU seconds",
       "type": "timeseries"
     },
     {
@@ -2675,9 +2761,9 @@
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
-        "regex": "/instance=\"(?<text>quay)\",job=\"(?<value>quay)\"/",
+        "regex": "/instance=\"(?<value>.*)\",job=\"quay\"/",
         "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       },
       {
@@ -2694,9 +2780,9 @@
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
-        "regex": "/instance=\"(?<text>clair)\",job=\"(?<value>clair)\"/",
+        "regex": "/instance=\"(?<value>.*)\",job=\"clair\"/",
         "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       },
       {
@@ -2747,6 +2833,6 @@
   "timezone": "",
   "title": "Quay Monitoring",
   "uid": "7TZRd214k",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
