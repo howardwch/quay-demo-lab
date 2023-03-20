@@ -30,7 +30,7 @@ if __name__ == '__main__':
     while True:
         try:    data = data_to_metrics(fetch_states(os.environ.get('QUAY_HEALTH_URI', 'http://localhost:8080')))
         except Exception as e:
-            data = data_to_metrics(dict(data=dict(services=[]), status_code=503))
+            data = data_to_metrics(dict(data=dict(services={'deadtime':int(time())}), status_code=503))
         try:    
             rsp = requests.post(
                 f"{os.environ.get('QUAY_PROM_URI', 'http://localhost:9091')}/metrics/job/quay/host/{os.environ.get('QUAY_HOST', gethostname())}", 
