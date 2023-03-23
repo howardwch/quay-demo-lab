@@ -1,9 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    kubernetes.io/ingress.class: traefik
   name: quay
 spec:
-  ingressClassName: traefik
   rules:
   - host: quay.example.com
     http:

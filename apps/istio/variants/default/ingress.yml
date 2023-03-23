@@ -2,9 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kiali
+  annotations:
+    kubernetes.io/ingress.class: traefik
   namespace: istio-system
 spec:
-  ingressClassName: traefik
   rules:
   - host: kiali.example.com
     http:
