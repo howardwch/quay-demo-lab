@@ -24,6 +24,6 @@ resources:
 
 images:
 - name: localhost/quay-health-monitor:latest
-  newName: quay.io/rhn_support_milang/quay-health-monitor:latest
+  newName: quay.io/rhn_support_milang/quay-health-monitor
   newTag: latest
 
