@@ -6,7 +6,7 @@ metadata:
   name: clair
 spec:
   rules:
-  - host: clair.example.com
+  - host: clair.macbook.chester.at
     http:
       paths:
       - backend:

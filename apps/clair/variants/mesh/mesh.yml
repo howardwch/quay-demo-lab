@@ -46,7 +46,7 @@ items:
     - istio-system/frontend-gateway
     hosts:
     - clairv4.clair.svc.cluster.local
-    - clair.example.com
+    - clair.macbook.chester.at
     http:
     - match:
       - uri:
