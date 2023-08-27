@@ -298,7 +298,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "sum by (status) ( rate(quay_registry_image_push_total{instance=\"$quay\",job=\"$quayjob\"}[5m]) )",
+          "expr": "sum by (status) ( rate(quay_registry_image_pushes_total{instance=\"$quay\",job=\"$quayjob\"}[5m]) )",
           "hide": false,
           "legendFormat": "push",
           "range": true,
