@@ -5,16 +5,19 @@ from time import sleep, time
 from socket import gethostname
 from datetime import datetime
 import os
+import logging
 
 from prometheus_client import (
     multiprocess,
     push_to_gateway,
-    Gauge,
+    Gauge, Counter,
     CollectorRegistry,
     REGISTRY,
     PROCESS_COLLECTOR,
     PLATFORM_COLLECTOR,
 )
+registry = CollectorRegistry()
+multiprocess.MultiProcessCollector(registry)
 
 QUAY_HEALTH_STATUS = Gauge(
     "quay_health_status",
@@ -31,7 +34,7 @@ QUAY_HEALTH_STATUS = Gauge(
         "storage",
         "status_code",
     ],
-)
+    )
 [
     REGISTRY.unregister(c)
     for c in [
@@ -40,9 +43,6 @@ QUAY_HEALTH_STATUS = Gauge(
         REGISTRY._names_to_collectors["python_gc_objects_collected_total"],
     ]
 ]
-registry = CollectorRegistry()
-multiprocess.MultiProcessCollector(registry)
-
 
 def fetch_states(URI):
     data = dict()
@@ -51,7 +51,9 @@ def fetch_states(URI):
             rsp = requests.get(
                 f"{URI}/health/{endpoint}", verify=os.environ.get("CA", False)
             )
+            logging.debug(f"metrics request {URI}/health/{endpoint} response {rsp.status_code} {rsp.reason}")
         except Exception as e:
+            logging.debug(f"metrics request {URI}/health/{endpoint} exception {e}")
             return data
         services = rsp.json().get("data").get("services")
         data.update(dict(map(lambda x: (x, int(services[x])), services)))
@@ -65,52 +67,61 @@ def fetch_states(URI):
 
 
 def data_to_metrics(data):
-    if data['status_code'] >= 300:  value = 0
-    else: value = 1
-    QUAY_HEALTH_STATUS.labels(**data).set(value)
-    return
+    logging.debug(f"scratch data: {data}")
+    QUAY_HEALTH_STATUS.labels(**data).set_to_current_time()
+    return data
 
 
 if __name__ == "__main__":
-    print(
-        f"starting monitoring {os.environ.get('QUAY_HEALTH_URI', 'http://localhost:8080')}"
-        + f" reporting at {os.environ.get('QUAY_PROM_URI', 'http://localhost:9091')}"
+    import sys
+    HOSTNAME = os.environ.get("QUAY_HOST", gethostname())
+    PUSHGW = f"{os.environ.get('QUAY_PROM_URI', 'http://localhost:9091')}"
+    HEALTH = os.environ.get("QUAY_HEALTH_URI", "http://localhost:8080")
+    if bool(os.environ.get('DEBUG', False)):
+        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    else: logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+    logging.info(f"Starting monitoring {HEALTH}")
+    logging.info(f"Reporting at {PUSHGW}"
     )
-    while True:
-        try:
-            data = data_to_metrics(
-                fetch_states(os.environ.get("QUAY_HEALTH_URI", "http://localhost:8080"))
-            )
-        except Exception as e:
-            data = data_to_metrics(
-                dict(
-                    auth=0,
-                    database=0,
-                    disk_space=0,
-                    registry_gunicorn=0,
-                    service_key=0,
-                    web_gunicorn=0,
-                    redis=0,
-                    storage=0,
-                    status_code=503,
-                    deadtime=int(time()),
+    try:
+        while True:
+            try:
+                data = data_to_metrics(
+                    fetch_states(HEALTH)
                 )
-            )
-        try:
-            push_to_gateway(
-                f"{os.environ.get('QUAY_PROM_URI', 'http://localhost:9091')}/metrics",
-                job="quay",
-                registry=registry,
-                grouping_key=dict(
-                    instance=os.environ.get("QUAY_HOST", gethostname()),
-                    host=os.environ.get("QUAY_HOST", gethostname()),
-                ),
-                timeout=300,
-            )
-        except Exception as gwerr:
-            print(f"PushGateway error: {gwerr}")
-        try:
-            sleep(int(os.environ.get("INTERVAL", 5)))
-        except (KeyboardInterrupt, Exception) as e:
-            print(f"shutting down on exception {e}")
-            break
+            except Exception as e:
+                logging.error(f"scraping metrics {e}")
+                data = data_to_metrics(
+                    dict(
+                        auth=0,
+                        database=0,
+                        disk_space=0,
+                        registry_gunicorn=0,
+                        service_key=0,
+                        web_gunicorn=0,
+                        redis=0,
+                        storage=0,
+                        status_code=503,
+                        deadtime=int(time()),
+                    )
+                )
+            try:
+                push_to_gateway(
+                    PUSHGW,
+                    job="quay",
+                    registry=registry,
+                    grouping_key=dict(
+                        instance=HOSTNAME,
+                        host=HOSTNAME,
+                    ),
+                )
+            except Exception as gwerr:
+                logging.error(f"PushGateway error: {gwerr}")
+            try:
+                sleep(int(os.environ.get("INTERVAL", 5)))
+            except (KeyboardInterrupt, Exception) as e:
+                logging.info(f"shutting down on exception {e}")
+                break
+    except (KeyboardInterrupt, Exception) as e:
+        logging.info(f"shutting down on exception {e}")
